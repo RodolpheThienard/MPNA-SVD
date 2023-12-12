@@ -3,11 +3,13 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <cblas.h>
 
 
 typedef double f64;
 typedef int32_t i32;
 typedef uint64_t u64;
+typedef size_t usize;
 
 
 #define ALLOC(X, Y)                                                           \
