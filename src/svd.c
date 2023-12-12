@@ -29,6 +29,7 @@ affiche_mat (i32 m, i32 n, f64 *mat)
     }
 }
 
+/* DEPRECATED */
 void
 transposeMatrix (f64 *matrix, i32 rows, i32 cols)
 {
