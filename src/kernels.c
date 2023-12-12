@@ -94,4 +94,44 @@ gram_schmidt_modified_2 (double *a, double *q, int n)
 
 /* TODO
  */
+f64
+gershgorin_test (f64 *A, usize n)
+{
+  f64 err_max = 0;
+  for (usize i = 0; i < n; i++)
+    {
+      f64 err = 0;
+      for (usize j = i + 1; j < n; j++)
+        err += fabs (A[j * n + i]);
+      if (err > err_max)
+        err_max = err;
+    }
+  return err_max;
+}
+
+/* TODO
+ */
 void
+qr_method (f64 *matrix_a, f64 *eigen_values, f64 *eigen_vectors, usize n)
+{
+  f64 *Q, *R;
+
+  ALLOC (sizeof (f64) * n * n, Q);
+  ALLOC (sizeof (f64) * n * n, R);
+
+  for (usize i = 0; i < ITERMAX; i++)
+    {
+      gram_schmidt_modified (Q, R, matrix_a, n);
+
+      cblas_dgemm (CblasRowMajor, CblasNoTrans, CblasNoTrans, n, n, n, 1, Q, n,
+                   R, n, 1, matrix_a, n);
+
+      if (gershgorin_test (matrix_a, n) < ERR)
+        break;
+    }
+  cblas_dcopy (n, R, n + 1, eigen_values, 1);
+  cblas_dcopy (n, Q, n, eigen_vectors, n);
+
+  free (Q);
+  free (R);
+}
