@@ -9,10 +9,24 @@ rdtsc ()
 }
 
 void
-test_matrice (f64 *M, i32 n)
+test_matrice (f64 *M, i32 m, i32 n)
 {
-  for (i32 i = 0; i < n * n; i++)
-    M[i] = i + 1;
+  srand( time( NULL ) );
+  for (i32 i = 0; i < m; i++)
+  {
+    for (i32 j = 0; j < n; j++)
+      M[i*n +j] = rand()%(n*m +1);
+  }
+}
+
+void
+test_matrice_v1(f64 *M, i32 m, i32 n)
+{
+  srand( time( NULL ) );
+  for (i32 i = 0; i < m; i++)
+  {
+      M[i*n] = rand()%11;
+  }
 }
 
 void

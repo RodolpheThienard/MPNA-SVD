@@ -4,21 +4,29 @@
 
 /* Bidiagonalization of Golub-Kahan-Lanczos
    B = U * AV
-   INPUT : allocated matrix a,b,u,v */
+   INPUT : allocated matrix a,b,u,v 
+   u: taille m*n
+   v: taille n*n
+   b : taille n
+   a ; taille m*n*/
 void
 bidiagonalisation (f64 *matrix_a, f64 *matrix_b, f64 *matrix_u, f64 *matrix_v,
                    usize m, usize n)
 {
-  for (usize i = 0; i < m; i++)
+
+  cblas_dscal(n, 1.0 / cblas_dnrm2(n, &matrix_v[0], n), &matrix_v[0], n); // On normalise le vecteur v1 initialisée au hasard
+
+  for (usize i = 0; i < n; i++)
     {
       for (usize j = 0; j < m; j++)
         {
-          matrix_u[j * m + i]
-              = cblas_ddot (n, &matrix_a[j * n], 1, &matrix_v[i], n);
+          matrix_u[j * n + i]
+              = cblas_ddot (n, &matrix_a[j*n], 1, &matrix_v[i], n);
+
           if (i == 0)
             continue;
-          matrix_u[j * m + i]
-              -= matrix_b[(i - 1) * n + i] * matrix_u[j * m + i - 1];
+          matrix_u[j * n + i]
+              -= matrix_b[(i - 1) * n + i] * matrix_u[j * n + (i - 1)];
         }
 
       matrix_b[i * n + i] = cblas_dnrm2 (m, &matrix_u[i], m);
@@ -34,10 +42,10 @@ bidiagonalisation (f64 *matrix_a, f64 *matrix_b, f64 *matrix_u, f64 *matrix_v,
             = cblas_ddot (m, &matrix_a[j], n, &matrix_u[i], m)
               - matrix_b[i * n + i] * matrix_v[j * n + i];
 
-      matrix_b[i * n + i + 1] = cblas_dnrm2 (n, &matrix_v[i + 1], n);
+      matrix_b[i * n + (i +1)] = cblas_dnrm2 (n, &matrix_v[i + 1], n);
 
       for (usize j = 0; j < m; j++)
-        matrix_v[j * n + i + 1] /= matrix_b[i * n + i + 1];
+        matrix_v[j * n + i + 1] /= matrix_b[i * n + (i+1) ];
     }
 }
 
@@ -49,8 +57,8 @@ gram_schmidt_modified (f64 *Q, f64 *R, f64 *matrix_a, usize n)
   for (usize i = 0; i < n; i++)
     {
       for (usize j = 0; j < n; j++)
-        Q[j * n + i] = matrix_a[j * n + i];
-
+            Q[j * n + i] = (i == j) ? 1.0 : 0.0;
+      
       for (usize j = 0; j < n; j++)
         {
           R[j * n + i] = cblas_ddot (n, Q + j * n, 1, Q + i * n, 1);
@@ -135,3 +143,5 @@ qr_method (f64 *matrix_a, f64 *eigen_values, f64 *eigen_vectors, usize n)
   free (Q);
   free (R);
 }
+
+

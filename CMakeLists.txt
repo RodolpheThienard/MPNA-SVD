@@ -6,6 +6,7 @@ add_executable(
   Main.exe
   src/main.c
   src/svd.c
+  src/kernels.c
 )
 
 target_link_libraries(
