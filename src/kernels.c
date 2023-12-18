@@ -175,13 +175,15 @@ qr_method (f64 *matrix_a, f64 *eigen_values, f64 *eigen_vectors, usize m,
       // cblas_dgemm (CblasRowMajor, CblasNoTrans, CblasNoTrans, n, n, n, 1, Q,
       // n,
       // R, n, 1, matrix_a, n);
+      puts ("ICI");
+      affiche_mat (n, n, Q);
 
       if (gershgorin_test (matrix_a, n) < ERR)
         break;
     }
 
   cblas_dcopy (n, R, n + 1, eigen_values, 1);
-  cblas_dcopy (n, Q, n, eigen_vectors, n);
+  cblas_dcopy (n * n, Q, 1, eigen_vectors, 1);
 
   free (Q);
   free (R);
