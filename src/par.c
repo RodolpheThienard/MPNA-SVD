@@ -1,7 +1,9 @@
 #include "../include/kernels.h"
 #include "../include/utils.h"
+#include <bits/time.h>
 #include <cblas-openblas.h>
 #include <cblas.h>
+#include <time.h>
 
 i32
 main (i32 argc, char *argv[])
@@ -13,7 +15,7 @@ main (i32 argc, char *argv[])
   // definition
   i32 size_m = atoi (argv[1]);
   i32 size_n = atoi (argv[2]);
-  i32 size_min = minimum(size_n, size_m);
+  i32 size_min = MIN (size_n, size_m);
   f64 *matrix_a, *matrix_u1, *matrix_u2, *matrix_c, *matrix_b1, *matrix_b2,
       *matrix_v1, *matrix_v2, *eval_v, *eval, *sigma, *res, *res2, *matrix_ut;
 
@@ -26,7 +28,7 @@ main (i32 argc, char *argv[])
   ALLOC (matrix_v1, size_n * size_n);
   ALLOC (matrix_v2, size_n * size_n);
   ALLOC (matrix_c, size_n * size_n);
-  ALLOC (eval, size_min);   //Il y a min(n,m) valeur propre
+  ALLOC (eval, size_min); // Il y a min(n,m) valeur propre
   ALLOC (eval_v, size_n);
   ALLOC (sigma, size_m * size_n);
   ALLOC (res, size_m * size_n);
@@ -38,7 +40,6 @@ main (i32 argc, char *argv[])
   // Initialisation vecteur v1
   test_matrice_v1 (matrix_v1, size_n, size_n);
 
-
 #ifdef DEBUG
   printf ("Matrice A\n");
   affiche_mat (size_m, size_n, matrix_a);
@@ -46,7 +47,9 @@ main (i32 argc, char *argv[])
 
   // Beginning of measurement
 #ifdef BENCHMARK
-  u64 t0 = rdtsc ();
+  struct timespec t0, t1;
+  clock_gettime (CLOCK_MONOTONIC_RAW, &t0);
+  u64 r0 = rdtsc ();
 #endif
 
   // Bidiagonalisation de C = U1*AV1
@@ -77,7 +80,7 @@ main (i32 argc, char *argv[])
   // Sigma final
   for (int i = 0; i < size_min; i++)
     {
-          sigma[(i * size_n + i)] = sqrt (eval[i]);
+      sigma[(i * size_n + i)] = sqrt (eval[i]);
     }
 
 #ifdef DEBUG
@@ -94,8 +97,11 @@ main (i32 argc, char *argv[])
 
   // End of measurement + print
 #ifdef BENCHMARK
-  u64 t1 = rdtsc ();
-  printf ("total cycles : %ld\n", t1 - t0);
+  u64 r1 = rdtsc ();
+  clock_gettime (CLOCK_MONOTONIC_RAW, &t1);
+  printf ("total cycles : %ld\n", r1 - r0);
+  printf ("total time elapsed : %lf\n",
+          (t1.tv_sec + t1.tv_nsec * 1e-9) - (t0.tv_sec + t0.tv_nsec * 1e-9));
 #endif
 
   return 0;

@@ -3,17 +3,28 @@ cmake_minimum_required(VERSION 3.10)
 project(SVD)
 
 add_executable(
-  Main.exe
-  src/main.c
-  src/svd.c
+  seq
+  src/seq.c
+  src/utils.c
+  src/kernels.c
+)
+
+add_executable(
+  par
+  src/par.c
+  src/utils.c
   src/kernels.c
 )
 
 target_link_libraries(
-  Main.exe 
+  seq
   -lm
   -lblas
-  -llapacke
+)
+target_link_libraries(
+  par
+  -lm
+  -lblas
 )
 
 if (DEBUG)
