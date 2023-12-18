@@ -53,7 +53,6 @@ main (i32 argc, char *argv[])
 #endif
 
   // Cacul du SVD de C = U2 SIGMA V2*
-
   // Compute U2 = vecteur propre de B1=CCt
   cblas_dgemm (CblasRowMajor, CblasNoTrans, CblasTrans, size_n, size_n, size_n,
                1.0, matrix_c, size_n, matrix_c, size_n, 0.0, matrix_b1,
@@ -110,7 +109,7 @@ main (i32 argc, char *argv[])
 #ifdef DEBUG
   printf ("Matrice sigma\n");
   affiche_mat (size_m, size_n, sigma);
-#endif
+#endif 
   /*cblas_dgemm (CblasRowMajor, CblasTrans, CblasTrans, size_m, size_n, size_n,
                1.0, evec, size_m, sigma, size_n, 0.0, res, size_m);
 

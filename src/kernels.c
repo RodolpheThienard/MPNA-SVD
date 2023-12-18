@@ -14,7 +14,7 @@ bidiagonalisation (f64 *matrix_a, f64 *matrix_b, f64 *matrix_u, f64 *matrix_v,
                    usize m, usize n)
 {
 
-  cblas_dscal (n, 1.0 / cblas_dnrm2 (n, &matrix_v[0], n), &matrix_v[0],
+  cblas_dscal (n, 1.0 /column_euclidean_norm(matrix_v, n, n, 0), &matrix_v[0],
                n); // On normalise le vecteur v1 initialisée au hasard
 
   for (usize i = 0; i < n; i++)
@@ -24,36 +24,50 @@ bidiagonalisation (f64 *matrix_a, f64 *matrix_b, f64 *matrix_u, f64 *matrix_v,
           matrix_u[j * n + i]
               = cblas_ddot (n, &matrix_a[j * n], 1, &matrix_v[i], n);
 
+       
           if (i == 0)
             continue;
+
+      //Probleme à cette étape, à la n-1 itération, avant cette opération la n-1 colonne de u à des valeur différente de 0 
+      //alors que après cette opération elle deviens systématiquement nul alors que matrix_b[(i - 1) * n + i]et
+      // matrix_u[j * n + (i - 1)] sont non nul
           matrix_u[j * n + i]
               -= matrix_b[(i - 1) * n + i] * matrix_u[j * n + (i - 1)];
-        }
+      }
 
-      matrix_b[i * n + i] = cblas_dnrm2 (m, &matrix_u[i], m);
+      matrix_b[i * n + i] = column_euclidean_norm(matrix_u, m, n, i);
 
+      
+      
       for (usize j = 0; j < m; j++)
-        matrix_u[j * m + i] /= matrix_b[i * n + i];
+        matrix_u[j * n + i] /= matrix_b[i * n + i];
 
       if (i == n - 1)
         continue;
+      
+      for (usize j = 0; j < n; j++)
+      {
+          for (usize k = 0; k < m; k++)
+            {
+                matrix_v[j * n + i+1]  += matrix_a[k*n + j] * matrix_u[k * n + i];
+            }
+        matrix_v[j * n + i + 1] -= matrix_b[i * n + i] * matrix_v[j * n + i];
+      }
+      matrix_b[i * n + (i + 1)] = column_euclidean_norm(matrix_v, n, n, i+1);
 
-      for (usize j = 0; j < m; j++)
-        matrix_v[j * n + i + 1]
-            = cblas_ddot (m, &matrix_a[j], n, &matrix_u[i], m)
-              - matrix_b[i * n + i] * matrix_v[j * n + i];
+  
 
-      matrix_b[i * n + (i + 1)] = cblas_dnrm2 (n, &matrix_v[i + 1], n);
-
-      for (usize j = 0; j < m; j++)
+     
+      for (usize j = 0; j < n; j++)
         matrix_v[j * n + i + 1] /= matrix_b[i * n + (i + 1)];
+
     }
 }
 
 /* TODO
  */
 void
-gram_schmidt_modified (f64 *Q, f64 *R, f64 *matrix_a, usize n)
+gram_schmidt_modified (f64 *Q, f64 *R, f64 * matrix_a, usize n)
 {
   for (usize i = 0; i < n; i++)
     {

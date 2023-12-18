@@ -65,3 +65,16 @@ transposeMatrix (f64 *matrix, i32 rows, i32 cols)
 
   free (tempMatrix);
 }
+
+
+f64 column_euclidean_norm(f64 *matrix, i32 rows, i32 cols, i32 col)
+{
+    f64 sum_of_squares = 0.0;
+
+    for (usize i = 0; i < rows; i++)
+    {
+        sum_of_squares += matrix[i * cols + col] * matrix[i * cols + col];
+    }
+
+    return sqrt(sum_of_squares);
+}
