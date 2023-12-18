@@ -78,3 +78,8 @@ f64 column_euclidean_norm(f64 *matrix, i32 rows, i32 cols, i32 col)
 
     return sqrt(sum_of_squares);
 }
+
+i32 minimum(i32 size_n, i32 size_m) 
+{
+    return (size_n < size_m) ? size_n : size_m;
+}

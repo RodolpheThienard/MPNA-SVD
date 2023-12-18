@@ -30,3 +30,4 @@ u64 rdtsc ();
 void test_matrice (f64 *, i32, i32);
 void test_matrice_v1 (f64 *M, i32 m, i32 n);
 f64 column_euclidean_norm( f64 *matrix, i32 rows, i32 cols, i32 col);
+i32 minimum(i32 size_n, i32 size_m);

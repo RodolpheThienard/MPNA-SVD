@@ -2,6 +2,8 @@
 #include <cblas.h>
 #include <math.h>
 
+
+
 void
 dgemm (double *C, double *A, double *B, int n)
 {
@@ -37,34 +39,36 @@ bidiagonalisation (f64 *matrix_a, f64 *matrix_b, f64 *matrix_u, f64 *matrix_v,
         {
           matrix_u[j * n + i]
               = cblas_ddot (n, &matrix_a[j * n], 1, &matrix_v[i], n);
+  
 
           if (i == 0)
             continue;
 
-          // Probleme à cette étape, à la n-1 itération, avant cette opération
-          // la n-1 colonne de u à des valeur différente de 0 alors que après
-          // cette opération elle deviens systématiquement nul alors que
-          // matrix_b[(i - 1) * n + i]et
-          //  matrix_u[j * n + (i - 1)] sont non nul
           matrix_u[j * n + i]
               -= matrix_b[(i - 1) * n + i] * matrix_u[j * n + (i - 1)];
         }
-
+          
       matrix_b[i * n + i] = column_euclidean_norm (matrix_u, m, n, i);
-
+          
+ 
       for (usize j = 0; j < m; j++)
         matrix_u[j * n + i] /= matrix_b[i * n + i];
+
 
       if (i == n - 1)
         continue;
 
       for (usize j = 0; j < n; j++)
-        {
+        { 
+                        matrix_v[j * n + i + 1]=0.0;
           for (usize k = 0; k < m; k++)
             {
+             
               matrix_v[j * n + i + 1]
                   += matrix_a[k * n + j] * matrix_u[k * n + i];
             }
+
+
           matrix_v[j * n + i + 1] -= matrix_b[i * n + i] * matrix_v[j * n + i];
         }
       matrix_b[i * n + (i + 1)]
@@ -139,8 +143,7 @@ gram_schmidt_modified (f64 *a, f64 *q, f64 *r, usize n)
   free (w);
 }
 
-/* TODO
- */
+
 f64
 gershgorin_test (f64 *A, usize n)
 {
@@ -156,8 +159,7 @@ gershgorin_test (f64 *A, usize n)
   return err_max;
 }
 
-/* TODO
- */
+
 void
 qr_method (f64 *matrix_a, f64 *eigen_values, f64 *eigen_vectors, usize m,
            usize n)
@@ -175,8 +177,8 @@ qr_method (f64 *matrix_a, f64 *eigen_values, f64 *eigen_vectors, usize m,
       // cblas_dgemm (CblasRowMajor, CblasNoTrans, CblasNoTrans, n, n, n, 1, Q,
       // n,
       // R, n, 1, matrix_a, n);
-      puts ("ICI");
-      affiche_mat (n, n, Q);
+     // puts ("ICI");
+      //affiche_mat (n, n, Q);
 
       if (gershgorin_test (matrix_a, n) < ERR)
         break;
