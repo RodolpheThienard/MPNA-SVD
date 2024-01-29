@@ -9,7 +9,7 @@ rdtsc ()
 }
 
 void
-test_matrice (f64 *M, i32 m, i32 n)
+Matrix_initialization (f64 *M, i32 m, i32 n)
 {
   srand (time (NULL));
   for (i32 i = 0; i < m; i++)
@@ -20,7 +20,7 @@ test_matrice (f64 *M, i32 m, i32 n)
 }
 
 void
-test_matrice_v1 (f64 *M, i32 m, i32 n)
+Initialization_v1 (f64 *M, i32 m, i32 n)
 {
   srand (time (NULL));
   for (i32 i = 0; i < m; i++)
@@ -54,4 +54,38 @@ column_euclidean_norm (f64 *matrix, i32 rows, i32 cols, i32 col)
     }
 
   return sqrt (sum_of_squares);
+}
+
+void
+transposeMatrix (f64 *matrix,f64* matrix_tr, i32 rows, i32 cols)
+{
+
+  // inversion de l'ordre
+  for (i32 i = 0; i < rows; ++i)
+    {
+      for (i32 j = 0; j < cols; ++j)
+        {
+          matrix_tr[j * rows + i] = matrix[i* cols + j];
+        }
+    }
+}
+
+
+f64 Norm_Frobenius(i32 rows, i32 cols, f64 *matrix)
+{
+    f64 result=0.0;
+
+    for(i32 i=0; i<rows; i++)
+    {
+        for(i32 j=0; j<cols;j++)
+            result += matrix[i*cols+j]*matrix[i*cols+j];
+        
+    }
+    return sqrt(result);
+}
+
+void copy_matrix(i32 rows, i32 cols, f64* matrix_copy, f64* matrix) {
+    for (i32 i = 0; i < rows*cols; i++) {
+        matrix_copy[i] = matrix[i];
+    }
 }
