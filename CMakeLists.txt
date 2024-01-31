@@ -20,11 +20,13 @@ target_link_libraries(
   seq
   -lm
   -lblas
+  -llapacke
 )
 target_link_libraries(
   par
   -lm
   -lblas
+  -llapacke
 )
 
 if (DEBUG)

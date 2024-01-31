@@ -109,8 +109,9 @@ main (i32 argc, char *argv[])
 
 
   // Sigma final
-  for (int i = 0; i < size_max; i++)
+  for (usize i = 0; i < size_min; i++)
     {
+          printf("%f ",sqrt (eval[i]));
           sigma[(i * size_max + i)] = sqrt (eval[i]);
     }
 
@@ -153,9 +154,7 @@ cblas_daxpby(size_m * size_n, 1.0, matrix_a, 1,-1.0, matrix_a_compute, 1);
 
 
 //Deuxième étape calculer le SVD de A grace à lapack
-//On utilise une copie de la matrice A car la fonction de lapacke modifie la matrice A
-
-copy_matrix(size_m,size_n,matrix_a_copy,matrix_a);
+cblas_dcopy(size_m * size_n, matrix_a, 1, matrix_a_copy, 1);
 info = LAPACKE_dgesvd(LAPACK_ROW_MAJOR, 'A', 'A', size_m, size_n, matrix_a_copy, size_n, eval_ref, matrix_u_ref, size_m, matrix_v_ref, size_n,superb);
   if (info > 0)
   {
@@ -164,19 +163,17 @@ info = LAPACKE_dgesvd(LAPACK_ROW_MAJOR, 'A', 'A', size_m, size_n, matrix_a_copy,
   }
 
 // Sigma final
-  for (int i = 0; i < size_min; i++)
+  for (usize i = 0; i < size_min; i++)
     {
           sigma_ref[(i * size_n + i)] = eval_ref[i];
     }
 
 
 //Calcul de U_ref*Sigma_ref*Vt_ref
-//Calcul tmp=U_refsigma_ref
 cblas_dgemm (CblasRowMajor, CblasNoTrans, CblasNoTrans, size_m, size_n, size_min,
                1.0, matrix_u_ref, size_min, sigma_ref, size_n, 0.0, matrix_tmp_ref,
                size_n);
 
-//Calcul A_ref=tmp_refVt_ref
 cblas_dgemm (CblasRowMajor, CblasNoTrans, CblasNoTrans, size_m, size_n, size_n,
                1.0, matrix_tmp_ref, size_n, matrix_v_ref, size_n, 0.0, matrix_a_ref,
                size_n);
@@ -184,24 +181,19 @@ cblas_daxpby(size_m * size_n, 1.0, matrix_a, 1,-1.0, matrix_a_ref, 1);
 
 
 //Dernière étape calcul de l'erreur relative 
-error_lapack = ((Norm_Frobenius(size_m,size_n,matrix_a_ref)) / (Norm_Frobenius(size_m, size_n, matrix_a)))*100;
-error_compute = ((Norm_Frobenius(size_m,size_n,matrix_a_compute)) / (Norm_Frobenius(size_m, size_n, matrix_a)))*100;
+error_lapack = ((Norm_Frobenius(size_m,size_n,matrix_a_ref)) / (Norm_Frobenius(size_m, size_n, matrix_a)));
+error_compute = ((Norm_Frobenius(size_m,size_n,matrix_a_compute)) / (Norm_Frobenius(size_m, size_n, matrix_a)));
 //Erreur du calcul des valeur singulière
-for (i32 i = 0; i < size_min; i++) 
+for (usize i = 0; i < size_min; i++) 
 {
-  error_vs = fabs(eval[i] - eval_ref[i]) / fabs(eval_ref[i]);
+  error_vs = (fabs(sqrt(eval[i]) - eval_ref[i]) / fabs(eval_ref[i]));
 }
 
 
 #ifdef DEBUG
-  printf ("Matrice A_copy\n");
-  affiche_mat (size_m, size_n, matrix_a_copy);
-  printf ("Matrice A_ref\n");
-  affiche_mat (size_m, size_n, matrix_a_ref);
   printf("Erreur relative avec la svd lapack: %f\n", error_lapack);
   printf("Erreur relative de notre svd: %f\n", error_compute);
   printf("Erreur relative valeur singulière comparé à celle trouver par lapacke: %f\n", error_vs);
-
 #endif           
 
   // End of measurement + print
@@ -212,6 +204,7 @@ for (i32 i = 0; i < size_min; i++)
   printf ("total time elapsed : %lf\n",
           (t1.tv_sec + t1.tv_nsec * 1e-9) - (t0.tv_sec + t0.tv_nsec * 1e-9));
 #endif
+
 
   return 0;
 }

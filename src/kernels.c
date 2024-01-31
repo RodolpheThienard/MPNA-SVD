@@ -5,11 +5,11 @@
 void
 dgemm (double *C, double *A, double *B, int n)
 {
-  for (int i = 0; i < n; i++)
-    for (int j = 0; j < n; j++)
+  for (usize i = 0; i < n; i++)
+    for (usize j = 0; j < n; j++)
       {
         double r = 0;
-        for (int k = 0; k < n; k++)
+        for (usize k = 0; k < n; k++)
           r += A[i * n + k] * B[k * n + j];
         C[i * n + j] = r;
       }
@@ -76,18 +76,18 @@ bidiagonalisation (f64 *matrix_a, f64 *matrix_b, f64 *matrix_u, f64 *matrix_v,
 void
 modifiedGramSchmidt (f64 *A, f64 *Q, f64 *R, usize m, usize n)
 {
-  for (int k = 0; k < m; ++k)
+  for (usize k = 0; k < m; ++k)
     {
       // Calcul de R
-      for (int j = 0; j < k; ++j)
+      for (usize j = 0; j < k; ++j)
         {
           double dotProduct = 0.0;
-          for (int i = 0; i < n; ++i)
+          for (usize i = 0; i < n; ++i)
             {
               dotProduct += Q[i * n + j] * A[i * m + k];
             }
           R[j * m + k] = dotProduct;
-          for (int i = 0; i < n; ++i)
+          for (usize i = 0; i < n; ++i)
             {
               A[i * m + k] -= R[j * n + k] * Q[i * n + j];
             }
@@ -95,7 +95,7 @@ modifiedGramSchmidt (f64 *A, f64 *Q, f64 *R, usize m, usize n)
 
       // Normalisation et mise à jour de Q
       double norm = 0.0;
-      for (int i = 0; i < n; ++i)
+      for (usize i = 0; i < n; ++i)
         {
           norm += A[i * m + k] * A[i * m + k];
         }
@@ -103,14 +103,14 @@ modifiedGramSchmidt (f64 *A, f64 *Q, f64 *R, usize m, usize n)
 
       R[k * m + k] = norm;
 
-      for (int i = 0; i < n; ++i)
+      for (usize i = 0; i < n; ++i)
         {
           Q[i * n + k] = A[i * m + k] / norm;
         }
     }
 }
 
-/* Written in courses */
+
 void
 gram_schmidt_modified (f64 *a, f64 *q, f64 *r, usize n)
 {
@@ -173,7 +173,8 @@ qr_method (f64 *matrix_a, f64 *eigen_values, f64 *eigen_vectors, usize m,
       if (gershgorin_test (matrix_a, n) < ERR)
         break;
     }
-
+  printf("R:\n");
+  affiche_mat(n,n,R);
   cblas_dcopy (n, R, n + 1, eigen_values, 1);
   cblas_dcopy (n * n, Q, 1, eigen_vectors, 1);
 
